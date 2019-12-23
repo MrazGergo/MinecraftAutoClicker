@@ -20,10 +20,10 @@ namespace AutoClicker
 
         public void Init(string buttonName, uint buttonDownCode, uint buttonUpCode)
         {
-            //if(initialized)
-            //{
-            //    throw new Exception($"{nameof(ButtonInputs)}.{cbButtonEnable.Text} is already initialized!");
-            //}
+            if (initialized)
+            {
+                throw new Exception($"{nameof(ButtonInputs)}.{cbButtonEnable.Text} is already initialized!");
+            }
 
             this.buttonDownCode = buttonDownCode;
             this.buttonUpCode = buttonUpCode;
