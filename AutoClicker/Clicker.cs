@@ -8,10 +8,11 @@ namespace AutoClicker
         private readonly uint buttonDownCode;
         private readonly uint buttonUpCode;
         private readonly IntPtr minecraftHandle;
-        private readonly Timer timer;
+        private readonly Timer timer = new Timer();
 
+        private bool running = false;
         private bool hold = false;
-        private bool disposed;
+        private bool disposed = false;
 
         public Clicker(uint buttonDownCode, uint buttonUpCode, IntPtr minecraftHandle)
         {
@@ -19,7 +20,6 @@ namespace AutoClicker
             this.buttonUpCode = buttonUpCode;
             this.minecraftHandle = minecraftHandle;
 
-            timer = new Timer();
             timer.Tick += Timer_Tick;
         }
 
@@ -30,30 +30,56 @@ namespace AutoClicker
 
         public void Start(int delay)
         {
-            Stop();
+            if(running)
+            {
+                throw new InvalidOperationException($"Clicker is already running. Call the Stop function first. (btnDownCode: {buttonDownCode}, btnUpCode: {buttonUpCode})");
+            }
+
             hold = (delay == 0);
 
             if (hold)
             {
                 //Select the minecraft handle with Alt+Tab to not stop holding (when using the program)
-                Win32Api.PostMessage(minecraftHandle, buttonDownCode, (IntPtr)0x0001, IntPtr.Zero);
+                Hold();
             }
             else
             {
-                Click();
                 timer.Interval = delay;
                 timer.Start();
+                Click();
             }
+
+            running = true;
         }
 
         public void Stop()
         {
+            if(!running)
+            {
+                return;
+            }
+
             if (!hold)
             {
                 timer.Stop();
             }
+            else
+            {
+                Release();
+            }
 
             Click();
+            running = false;
+        }
+
+        private void Hold()
+        {
+            Win32Api.PostMessage(minecraftHandle, buttonDownCode, (IntPtr)0x0001, IntPtr.Zero);
+        }
+
+        private void Release()
+        {
+            Win32Api.PostMessage(minecraftHandle, buttonUpCode, IntPtr.Zero, IntPtr.Zero);
         }
 
         private void Click()
