@@ -39,7 +39,6 @@ namespace AutoClicker
 
             if (hold)
             {
-                //Select the minecraft handle with Alt+Tab to not stop holding (when using the program)
                 Hold();
             }
             else
@@ -63,18 +62,14 @@ namespace AutoClicker
             {
                 timer.Stop();
             }
-            else
-            {
-                Release();
-            }
 
-            Click();
+            Release();
             running = false;
         }
 
         private void Hold()
         {
-            Win32Api.PostMessage(minecraftHandle, buttonDownCode, (IntPtr)0x0001, IntPtr.Zero);
+            Win32Api.PostMessage(minecraftHandle, buttonDownCode, IntPtr.Zero, IntPtr.Zero);
         }
 
         private void Release()
